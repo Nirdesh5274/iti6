@@ -82,39 +82,65 @@
   });
 
   // Collection submit
-  collectionForm.addEventListener("submit", function(event) {
-    event.preventDefault();
-    const name = document.getElementById('name').value;
-    const amount = parseFloat(document.getElementById('amount').value);
-    const time = new Date().toLocaleString();
+ collectionForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+  const name = document.getElementById('name').value;
+  const amount = parseFloat(document.getElementById('amount').value);
+  const time = new Date().toLocaleString();
 
-    if (name && amount > 0) {
-      push(ref(db, "collections"), { name, amount, time });
-      renderCollectionTable();
+  if (name && amount > 0) {
+    if (editKey) {
+      // Update existing entry
+      set(ref(db, "collections/" + editKey), { name, amount, time }).then(() => {
+        editKey = null;
+        collectionForm.reset();
+        document.querySelector(".collection-form button").textContent = "Add";
+        renderCollectionTable();
+      });
+    } else {
+      // Add new entry
+      push(ref(db, "collections"), { name, amount, time }).then(() => {
+        collectionForm.reset();
+        renderCollectionTable();
+      });
     }
-  });
+  }
+});
+
+
 
   // Render collection data
   function renderCollectionTable() {
     collectionTable.innerHTML = "";
     const collectionsRef = ref(db, "collections");
+ const totalAmountDiv = document.getElementById("totalAmount");
+
 
     onValue(collectionsRef, (snapshot) => {
+    collectionTable.innerHTML = ""; 
+  let total = 0;
       const data = snapshot.val();
       if (data) {
-        Object.entries(data).forEach(([key, entry]) => {
+        Object.entries(data).sort((a, b) => new Date(b[1].time) - new Date(a[1].time)).forEach(([key, entry]) => {
+
+      total += parseFloat(entry.amount) || 0;
+
           const row = collectionTable.insertRow();
           row.innerHTML = `
             <td>${entry.name}</td>
             <td>${entry.amount}</td>
             <td>${entry.time}</td>
-            <td><button class="delete-btn" data-key="${key}">Delete</button></td>
-          `;
+           <td>
+  <button class="edit-btn" data-key="${key}" data-name="${entry.name}" data-amount="${entry.amount}">Edit</button>
+  <button class="delete-btn" data-key="${key}">Delete</button>
+</td>
+   `;
           row.querySelector(".delete-btn").addEventListener("click", function() {
             deleteCollection(key);
           });
         });
       }
+  totalAmountDiv.textContent = `Total Collection: ₹${total.toFixed(2)}`;
     });
   }
 
@@ -130,6 +156,34 @@
         alert("Error deleting entry: " + error.message);
       });
   }
+
+let editKey = null; // Keeps track of which entry we're editing
+
+// Attach event listeners for edit buttons after rendering
+document.querySelectorAll(".edit-btn").forEach(button => {
+  button.addEventListener("click", function () {
+    const key = this.getAttribute("data-key");
+    const name = this.getAttribute("data-name");
+    const amount = this.getAttribute("data-amount");
+
+    // Populate form with current values
+    document.getElementById('name').value = name;
+    document.getElementById('amount').value = amount;
+    editKey = key;
+
+    // Change submit button text to indicate editing
+    document.querySelector(".collection-form button").textContent = "Update";
+  });
+});
+
+function cancelEdit() {
+  editKey = null;
+  collectionForm.reset();
+  document.querySelector(".collection-form button").textContent = "Add";
+}
+
+
+
 </script>
 
 
@@ -662,9 +716,13 @@ thank you
         <input type="text" id="name" placeholder="Name" required>
         <input type="number" id="amount" placeholder="Amount" required>
         <button type="submit">Add Entry</button>
-      </form>
+<button type="button" onclick="cancelEdit()">Cancel</button>
+ </form>
 
       <table>
+<div id="totalAmount" style="margin-top: 10px; font-weight: bold; font-size: 1.2rem; color: #28a745;"></div>
+
+
         <thead>
           <tr>
             <th>Name</th>
