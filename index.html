@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>11 Star Club NGO</title>
+  <title>11 Star Club Maksudpur</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -34,9 +34,23 @@ let editKey = null;
   const passwordInput = document.getElementById('password');
   const loginLink = document.getElementById('loginLink');
   const logoutLink = document.getElementById('logoutLink');
+  const menuToggle = document.getElementById('menuToggle');
+  const mainNav = document.getElementById('mainNav');
   const collectionSection = document.getElementById('collection-section');
   const collectionTable = document.getElementById('collectionTable');
   const collectionForm = document.querySelector('.collection-form');
+
+  menuToggle.addEventListener('click', function () {
+    const isOpen = mainNav.classList.toggle('is-open');
+    menuToggle.setAttribute('aria-expanded', isOpen);
+  });
+
+  mainNav.addEventListener('click', function (event) {
+    if (event.target.tagName === 'A' && window.innerWidth <= 768) {
+      mainNav.classList.remove('is-open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    }
+  });
 
   // Login
   loginForm.addEventListener("submit", function(event) {
@@ -248,6 +262,17 @@ function deleteCollection(key) {
 
     header nav {
       text-align: right;
+    }
+
+    .menu-toggle {
+      display: none;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      font-size: 2rem;
+      line-height: 1;
+      padding: 8px;
     }
 
     header nav a {
@@ -614,6 +639,156 @@ th {
       border: 0;
     }
 
+    @media (max-width: 768px) {
+      body {
+        margin-top: 92px;
+      }
+
+      header {
+        padding: 10px 16px;
+        min-height: 76px;
+      }
+
+      header .logo {
+        width: 64px;
+      }
+
+      header > div {
+        margin-left: 8px !important;
+        vertical-align: top;
+      }
+
+      header > div h1 {
+        font-size: 1.35rem;
+      }
+
+      header > div h2 {
+        font-size: .85rem !important;
+        margin-top: 0 !important;
+      }
+
+      .menu-toggle {
+        display: block;
+        float: right;
+      }
+
+      header nav {
+        display: none;
+        clear: both;
+        padding-top: 10px;
+        text-align: left;
+      }
+
+      header nav.is-open {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      header nav a {
+        display: block;
+        margin-left: 0;
+        padding: 10px 12px;
+        font-size: 1rem;
+        border-radius: 6px;
+      }
+
+      .main-content {
+        margin: 30px 14px;
+        gap: 16px;
+      }
+
+      .about-ngo,
+      .members,
+      .login,
+      #collection-section,
+      .location {
+        padding: 22px 16px;
+        margin-top: 24px;
+      }
+
+      .about-ngo h2,
+      .members h2,
+      .login h2,
+      #collection-section h2,
+      .location h2 {
+        font-size: 2rem;
+      }
+
+      .about-ngo p,
+      .location p {
+        font-size: 1rem;
+      }
+
+      .photo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .photo-card {
+        padding: 8px;
+      }
+
+      .members ul {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px 8px;
+      }
+
+      .members li {
+        font-size: .95rem;
+      }
+
+      .members li img {
+        width: 88px;
+        height: 88px;
+        margin-bottom: 8px;
+      }
+
+      .collection-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .collection-form input,
+      .collection-form button {
+        width: 100%;
+        margin: 0;
+      }
+
+      .collection-form button {
+        padding: 10px 12px;
+        font-size: 1rem;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      th,
+      td {
+        padding: 9px 7px;
+      }
+
+      .map-container {
+        height: 280px;
+      }
+
+      footer {
+        margin-top: 24px;
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .photo-grid,
+      .collection-form {
+        grid-template-columns: 1fr;
+      }
+    }
+
 
   </style>
 </head>
@@ -622,10 +797,11 @@ th {
   <header>
     <img src="l.jpeg" alt="11 Star Club Logo" class="logo">
     <div style="display: inline-block; margin-left: 20px; color: #fff;">
-      <h1 style="color: red;">11 Star Official</h1>
+      <h1 style="color: red;">11 Star Club</h1>
       <h2 style="font-size: 1.2em; margin-top: 5px;">Since 2008</h2>
     </div>
-    <nav>
+    <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mainNav">&#9776;</button>
+    <nav id="mainNav">
       <a href="#home" id="homeLink">Home</a>
       <a href="#about-us">About Us</a>
       <a href="#members">Members</a>
@@ -640,7 +816,7 @@ th {
 
  
   <!-- Main Content Section -->
-<div>11 star official</div>
+<div>11 star Club</div>
   <div id="home" class="main-content">
     <!-- About NGO Section -->
     <div id="about-us" class="about-ngo">
@@ -651,7 +827,7 @@ we mainly celebrate saraswati puja.we get full support from society that is malk
 
 thank you
 
-11 star offical</p>
+11 star Club</p>
     </div>
 
     <!-- Photo Grid Section -->
